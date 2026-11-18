@@ -40,7 +40,7 @@ def kpi(col, label, value, sub="", color="#2563EB"):
 
 
 def plot(fig):
-    st.plotly_chart(fig, width="stretch", config={"displaylogo": False, "toImageButtonOptions": {"scale": 3}})
+    st.plotly_chart(fig, width="stretch", theme=None, config={"displaylogo": False, "toImageButtonOptions": {"scale": 3}})
 
 
 @st.cache_data(show_spinner=False)
