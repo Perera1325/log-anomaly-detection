@@ -1,5 +1,5 @@
 Model,Anomalies,Normal,Anomaly Rate (%)
-IsolationForest,5,95,5.0
+IsolationForest,4,96,4.0
 OneClassSVM,9,91,9.0
-LOF,5,95,5.0
+LOF,6,94,6.0
 Ensemble (>=2 votes),5,95,5.0

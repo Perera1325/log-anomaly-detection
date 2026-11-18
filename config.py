@@ -12,7 +12,8 @@ LIVE_FILE = RAW_DIR / "live_events.csv"          # events replayed by the monito
 TRUTH_FILE = RAW_DIR / "ground_truth.csv"        # optional labels (synthetic data only)
 
 CLEAN_FILE = PROC_DIR / "logon_cleaned.csv"
-FEATURE_FILE = PROC_DIR / "user_features.csv"
+FEATURE_FILE = PROC_DIR / "user_features.csv"           # one row per user (final state)
+TRAINING_FILE = PROC_DIR / "training_features.csv"       # user snapshots over time (training set)
 MODEL_RESULTS_FILE = PROC_DIR / "model_results.csv"
 
 COMPARISON_FILE = RESULTS_DIR / "model_comparison.csv"
@@ -25,6 +26,8 @@ LINUX_LOG_YEAR = 2026                            # syslog lines carry no year
 VALID_EVENT_IDS = [4624, 4625]    # 4624 = logon success, 4625 = logon failure
 OFF_HOURS = (7, 19)               # outside 07:00-19:00 counts as off-hours
 CONTAMINATION = 0.05
+SNAPSHOT_FRACS = (0.55, 0.65, 0.75, 0.85, 0.95)   # history cut-offs used to build training snapshots
+MIN_SNAPSHOT_EVENTS = 5
 RANDOM_STATE = 42
 WINDOW_DAYS = 30                  # rolling window used by the real-time monitor
 MIN_EVENTS_FOR_SCORING = 20

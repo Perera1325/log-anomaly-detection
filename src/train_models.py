@@ -5,30 +5,32 @@ from sklearn.neighbors import LocalOutlierFactor
 from sklearn.preprocessing import StandardScaler
 from sklearn.svm import OneClassSVM
 
-from config import CONTAMINATION, MODELS_DIR, MODEL_RESULTS_FILE, RANDOM_STATE
+from config import CONTAMINATION, MODELS_DIR, MODEL_RESULTS_FILE, RANDOM_STATE, TRAINING_FILE
 from src.features import FEATURE_COLS
 
 
 def train_models(feature_file):
     print("\nLoading features...")
-    df = pd.read_csv(feature_file)
+    df = pd.read_csv(feature_file)                     # one row per user: what we report on
     users = df["user"]
-    scaler = StandardScaler().fit(df[FEATURE_COLS])
+    train = pd.read_csv(TRAINING_FILE) if TRAINING_FILE.exists() else df   # snapshots over time
+    scaler = StandardScaler().fit(train[FEATURE_COLS])
+    X_train = scaler.transform(train[FEATURE_COLS])
     X_scaled = scaler.transform(df[FEATURE_COLS])
 
     print("Training Isolation Forest...")
-    iso = IsolationForest(contamination=CONTAMINATION, random_state=RANDOM_STATE).fit(X_scaled)
+    iso = IsolationForest(contamination=CONTAMINATION, random_state=RANDOM_STATE).fit(X_train)
 
     print("Training One-Class SVM...")
-    svm = OneClassSVM(nu=CONTAMINATION, kernel="rbf", gamma="scale").fit(X_scaled)
+    svm = OneClassSVM(nu=CONTAMINATION, kernel="rbf", gamma="scale").fit(X_train)
 
+    # snapshots of one user are near-duplicates, so look beyond them: neighbours > snapshots per user
+    LOF_NEIGHBORS = max(20, 3 * (len(train) // max(len(df), 1)) + 10)
     print("Training Local Outlier Factor (novelty=True so it can score new data)...")
-    lof = LocalOutlierFactor(contamination=CONTAMINATION, novelty=True).fit(X_scaled)
+    lof = LocalOutlierFactor(n_neighbors=LOF_NEIGHBORS, contamination=CONTAMINATION, novelty=True).fit(X_train)
 
-    # Training-set labels. For LOF, predict() on its own training data is optimistic
-    # (each point is its own neighbour), so use the stored training outlier factors.
-    lof_scores = lof.negative_outlier_factor_
-    lof_pred = (lof_scores < lof.offset_).astype(int) * -2 + 1   # -1 anomaly / 1 normal
+    lof_scores = lof.score_samples(X_scaled)             # final per-user state, scored against all snapshots
+    lof_pred = lof.predict(X_scaled)
 
     results = pd.DataFrame({
         "user": users,
