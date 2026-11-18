@@ -1,0 +1,6 @@
+,value
+mean_pairwise_kappa,0.602
+flagged_by_all_3,6.0
+flagged_by_exactly_2,6.0
+flagged_by_exactly_1,9.0
+isolation_forest_seed_stability_jaccard,0.879

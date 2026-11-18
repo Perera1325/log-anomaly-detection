@@ -1,0 +1,11 @@
+services:
+  - type: web
+    name: log-anomaly-api
+    runtime: docker
+    plan: free
+    healthCheckPath: /health
+    envVars:
+      - key: API_KEY
+        generateValue: true
+      - key: ALERT_WEBHOOK_URL
+        sync: false

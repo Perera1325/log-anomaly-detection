@@ -1,0 +1,11 @@
+2026-11-18 10:26:16,206 [CRITICAL] user=U116 at 2026-11-04 00:11:46 | models=IsolationForest+OneClassSVM+LOF | fail_ratio=0.824 off_hours=0.402 pcs=1 max_fail_streak=23
+2026-11-18 10:26:16,281 [HIGH] user=U039 at 2026-11-04 00:17:11 | models=IsolationForest+LOF | fail_ratio=0.013 off_hours=1.0 pcs=1 max_fail_streak=1
+2026-11-18 10:26:16,412 [CRITICAL] user=U153 at 2026-11-04 00:22:28 | models=IsolationForest+OneClassSVM+LOF | fail_ratio=0.897 off_hours=0.46 pcs=1 max_fail_streak=26
+2026-11-18 10:26:16,478 [HIGH] user=U021 at 2026-11-04 00:24:41 | models=OneClassSVM+LOF | fail_ratio=0.043 off_hours=0.064 pcs=8 max_fail_streak=2
+2026-11-18 10:26:16,660 [CRITICAL] user=U027 at 2026-11-04 00:39:58 | models=IsolationForest+OneClassSVM+LOF | fail_ratio=0.85 off_hours=0.427 pcs=2 max_fail_streak=24
+2026-11-18 10:26:16,800 [CRITICAL] user=U080 at 2026-11-04 00:41:20 | models=IsolationForest+OneClassSVM+LOF | fail_ratio=0.034 off_hours=1.0 pcs=2 max_fail_streak=1
+2026-11-18 10:26:19,041 [CRITICAL] user=U021 at 2026-11-04 02:43:04 | models=IsolationForest+OneClassSVM+LOF | fail_ratio=0.116 off_hours=0.273 pcs=32 max_fail_streak=2
+2026-11-18 10:26:19,108 [CRITICAL] user=U008 at 2026-11-04 02:43:35 | models=IsolationForest+OneClassSVM+LOF | fail_ratio=0.016 off_hours=1.0 pcs=1 max_fail_streak=1
+2026-11-18 10:26:19,176 [CRITICAL] user=U047 at 2026-11-04 02:45:25 | models=IsolationForest+OneClassSVM+LOF | fail_ratio=0.826 off_hours=0.357 pcs=2 max_fail_streak=27
+2026-11-18 10:26:24,689 [CRITICAL] user=U149 at 2026-11-04 08:36:33 | models=IsolationForest+OneClassSVM+LOF | fail_ratio=0.067 off_hours=0.0 pcs=50 max_fail_streak=2
+2026-11-18 10:27:36,606 [CRITICAL] user=U039 at 2026-11-05 05:47:32 | models=IsolationForest+OneClassSVM+LOF | fail_ratio=0.02 off_hours=1.0 pcs=1 max_fail_streak=1

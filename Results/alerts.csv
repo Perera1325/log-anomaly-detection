@@ -1,0 +1,12 @@
+time,user,risk_level,votes,models,fail_ratio,off_hours_ratio,unique_pcs,max_fail_streak
+2026-11-04 00:11:46,U116,Critical,3,IsolationForest+OneClassSVM+LOF,0.824,0.402,1,23
+2026-11-04 00:17:11,U039,High,2,IsolationForest+LOF,0.013,1.0,1,1
+2026-11-04 00:22:28,U153,Critical,3,IsolationForest+OneClassSVM+LOF,0.897,0.46,1,26
+2026-11-04 00:24:41,U021,High,2,OneClassSVM+LOF,0.043,0.064,8,2
+2026-11-04 00:39:58,U027,Critical,3,IsolationForest+OneClassSVM+LOF,0.85,0.427,2,24
+2026-11-04 00:41:20,U080,Critical,3,IsolationForest+OneClassSVM+LOF,0.034,1.0,2,1
+2026-11-04 02:43:04,U021,Critical,3,IsolationForest+OneClassSVM+LOF,0.116,0.273,32,2
+2026-11-04 02:43:35,U008,Critical,3,IsolationForest+OneClassSVM+LOF,0.016,1.0,1,1
+2026-11-04 02:45:25,U047,Critical,3,IsolationForest+OneClassSVM+LOF,0.826,0.357,2,27
+2026-11-04 08:36:33,U149,Critical,3,IsolationForest+OneClassSVM+LOF,0.067,0.0,50,2
+2026-11-05 05:47:32,U039,Critical,3,IsolationForest+OneClassSVM+LOF,0.02,1.0,1,1

@@ -1,0 +1,4 @@
+,IsolationForest,OneClassSVM,LOF
+IsolationForest,1.0,0.49,0.825
+OneClassSVM,0.49,1.0,0.49
+LOF,0.825,0.49,1.0
