@@ -1,5 +1,5 @@
-Model,Anomalies,Normal,Anomaly Rate (%)
-IsolationForest,55,945,5.5
-OneClassSVM,96,904,9.6
-LOF,69,931,6.9
-Ensemble (>=2 votes),40,960,4.0
+Model,Anomalies,Normal,Anomaly Rate (%),Precision,Recall,F1,TP,FP,FN,TN
+IsolationForest,55,945,5.5,0.218,0.171,0.192,12,43,58,887
+OneClassSVM,96,904,9.6,0.073,0.1,0.084,7,89,63,841
+LOF,69,931,6.9,0.275,0.271,0.273,19,50,51,880
+Ensemble (>=2 votes),40,960,4.0,0.15,0.086,0.109,6,34,64,896
