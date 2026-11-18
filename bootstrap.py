@@ -6,8 +6,8 @@ from config import CLEAN_FILE, LIVE_FILE, MODELS_DIR, RAW_FILE, RISK_FILE, ROOT
 
 
 def ready() -> bool:
-    return all(p.exists() for p in [CLEAN_FILE, RISK_FILE, MODELS_DIR / "scaler.pkl",
-                                    MODELS_DIR / "lof.pkl", LIVE_FILE])
+    """Results + models exist. Raw data is NOT required, so committed real results are never overwritten."""
+    return all(p.exists() for p in [CLEAN_FILE, RISK_FILE, MODELS_DIR / "scaler.pkl", MODELS_DIR / "lof.pkl"])
 
 
 def ensure_ready():

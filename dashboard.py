@@ -107,6 +107,8 @@ with tab_over:
 
 # -------------------------------------------------------------- evaluation
 with tab_eval:
+    cons_path = RESULTS_DIR / "consistency_summary.csv"
+    cons = load_csv(cons_path, mtime(cons_path), index_col=0)["value"] if cons_path.exists() else pd.Series(dtype=float)
     if not has_truth:
         st.info("No ground-truth labels found, so precision / recall / F1 are not shown. Anomaly counts and "
                 "consistency are below.")
@@ -120,8 +122,6 @@ with tab_eval:
             summary.loc[summary['Precision'].idxmax(), "Model"], "#2563EB")
         kpi(c[2], "Best recall", f"{summary['Recall'].max():.2f}",
             summary.loc[summary['Recall'].idxmax(), "Model"], "#0D9488")
-        cons = load_csv(RESULTS_DIR / "consistency_summary.csv", mtime(RESULTS_DIR / "consistency_summary.csv"),
-                        index_col=0)["value"]
         kpi(c[3], "Mean model kappa", f"{cons['mean_pairwise_kappa']:.2f}", "agreement between detectors",
             "#F2B01E")
         st.write("")
@@ -141,7 +141,7 @@ with tab_eval:
         plot(charts.kappa_heatmap(kappa))
     with b:
         plot(charts.vote_combinations(results))
-    if (RESULTS_DIR / "consistency_summary.csv").exists():
+    if len(cons):
         stab = cons.get("isolation_forest_seed_stability_jaccard")
         if stab is not None:
             st.caption(f"Isolation Forest seed stability (Jaccard overlap of flagged users across 5 random seeds): "
