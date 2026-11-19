@@ -6,7 +6,7 @@ from sklearn.metrics import average_precision_score, roc_auc_score
 
 from bootstrap import ensure_ready
 from config import (ALERT_FILE, ALERT_MIN_VOTES, CLEAN_FILE, COMPARISON_FILE, CONTAMINATION, FEATURE_FILE,
-                    MIN_EVENTS_FOR_SCORING, MODEL_RESULTS_FILE, OFF_HOURS, RESULTS_DIR, RISK_FILE, TRUTH_FILE,
+                    MIN_EVENTS_FOR_SCORING, MODEL_RESULTS_FILE, MODELS_DIR, OFF_HOURS, RESULTS_DIR, RISK_FILE, TRUTH_FILE,
                     WINDOW_DAYS)
 from src import attack_tab, charts, ui
 from src.features import FEATURE_COLS
@@ -14,14 +14,15 @@ from src.features import FEATURE_COLS
 st.set_page_config(page_title="Log Anomaly Detection", layout="wide")
 ui.inject_css()
 ui.reset_numbers()
+animate = st.session_state.get("animate", True)
+if not animate:
+    st.markdown("<style>*, *::before, *::after {animation: none !important;}</style>", unsafe_allow_html=True)
 
 with st.spinner("Preparing data and models (first run only)..."):
     ensure_ready()
 
 
-def plot(fig):
-    st.plotly_chart(fig, width="stretch", theme=None,
-                    config={"displaylogo": False, "toImageButtonOptions": {"format": "svg", "scale": 3}})
+plot = ui.plot
 
 
 @st.cache_data(show_spinner=False)
@@ -55,6 +56,9 @@ if has_truth:
 with st.sidebar:
     st.markdown("### Log Anomaly Detection")
     st.caption("Unsupervised detection of anomalous logon behaviour in Windows and Linux authentication logs.")
+    st.toggle("Animations", value=True, key="animate")
+    st.divider()
+    ui.status_block(MODELS_DIR, ALERT_FILE)
     st.divider()
     st.markdown(f"<div class='meta'><b>Records</b><br>{len(clean):,} cleaned logon events<br><br>"
                 f"<b>Period</b><br>{d0:%d %b %Y} to {d1:%d %b %Y}<br><br>"
@@ -71,10 +75,14 @@ if has_truth:
     best = summary.loc[summary["F1"].idxmax()]
     summary_sentence = (f" Against the reference labels, the best single detector ({best['Model']}) reaches "
                         f"F1 = {best['F1']:.2f} (precision {best['Precision']:.2f}, recall {best['Recall']:.2f}).")
+hours = clean["timestamp"].dt.hour
+fail = (clean["event_id"] == 4625)
+bad_h = [int(((hours == h) & fail).sum()) for h in range(24)]
+ok_h = [int(((hours == h) & ~fail).sum()) for h in range(24)]
+ui.hero("Unsupervised Detection of Anomalous Logon Behaviour",
+        "A three-detector ensemble with model-agreement risk scoring, real-time alerting and per-account explanations",
+        ok_h, bad_h)
 st.markdown(
-    "<div class='titlebar'><p class='title'>Unsupervised Detection of Anomalous Logon Behaviour</p>"
-    "<p class='byline'>A three-detector ensemble with model-agreement risk scoring, real-time alerting and "
-    "per-account explanations</p></div>"
     f"<p class='abstract'><span class='h'>Summary.</span>This page reports an unsupervised analysis of "
     f"{len(clean):,} cleaned logon events (Windows Event IDs 4624 and 4625) from {len(risk):,} accounts. Each "
     f"account is described by {len(FEATURE_COLS)} behavioural features and scored independently by an Isolation "
