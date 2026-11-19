@@ -6,3 +6,6 @@ time,user,risk_level,votes,models,fail_ratio,off_hours_ratio,unique_pcs,max_fail
 2011-05-13 07:27:00,MNS0224,High,2,IsolationForest+OneClassSVM,0.0,0.582,530,0
 2011-05-13 07:33:00,WDO0870,High,2,IsolationForest+OneClassSVM,0.0,0.155,16,0
 2011-05-13 08:12:00,BKW0374,High,2,IsolationForest+OneClassSVM,0.0,0.558,499,0
+2011-05-16 06:47:00,KBB0189,High,2,OneClassSVM+LOF,0.0,0.464,1,0
+2011-05-16 07:01:00,KRG0158,High,2,OneClassSVM+LOF,0.0,0.456,1,0
+2011-05-16 08:07:00,PID0426,High,2,IsolationForest+OneClassSVM,0.0,0.153,13,0

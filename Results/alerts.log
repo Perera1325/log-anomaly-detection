@@ -667,3 +667,13 @@
 2026-11-19 13:02:18,691 [HIGH] user=MNS0224 at 2011-05-13 07:27:00 | models=IsolationForest+OneClassSVM | fail_ratio=0.0 off_hours=0.582 pcs=530 max_fail_streak=0
 2026-11-19 13:02:21,081 [HIGH] user=WDO0870 at 2011-05-13 07:33:00 | models=IsolationForest+OneClassSVM | fail_ratio=0.0 off_hours=0.155 pcs=16 max_fail_streak=0
 2026-11-19 13:03:04,054 [HIGH] user=BKW0374 at 2011-05-13 08:12:00 | models=IsolationForest+OneClassSVM | fail_ratio=0.0 off_hours=0.558 pcs=499 max_fail_streak=0
+2026-11-19 13:05:06,168 [HIGH] user=WPR0368 at 2011-05-13 03:11:10 | models=IsolationForest+OneClassSVM | fail_ratio=0.0 off_hours=0.536 pcs=603 max_fail_streak=0
+2026-11-19 13:05:08,154 [HIGH] user=DLM0051 at 2011-05-13 06:54:00 | models=OneClassSVM+LOF | fail_ratio=0.0 off_hours=0.232 pcs=3 max_fail_streak=0
+2026-11-19 13:05:08,778 [CRITICAL] user=AIB0948 at 2011-05-13 07:00:00 | models=IsolationForest+OneClassSVM+LOF | fail_ratio=0.0 off_hours=0.0 pcs=27 max_fail_streak=0
+2026-11-19 13:05:14,983 [HIGH] user=MMG0943 at 2011-05-13 07:09:00 | models=OneClassSVM+LOF | fail_ratio=0.0 off_hours=0.0 pcs=3 max_fail_streak=0
+2026-11-19 13:05:21,945 [HIGH] user=MNS0224 at 2011-05-13 07:27:00 | models=IsolationForest+OneClassSVM | fail_ratio=0.0 off_hours=0.582 pcs=530 max_fail_streak=0
+2026-11-19 13:05:25,388 [HIGH] user=WDO0870 at 2011-05-13 07:33:00 | models=IsolationForest+OneClassSVM | fail_ratio=0.0 off_hours=0.155 pcs=16 max_fail_streak=0
+2026-11-19 13:06:02,188 [HIGH] user=BKW0374 at 2011-05-13 08:12:00 | models=IsolationForest+OneClassSVM | fail_ratio=0.0 off_hours=0.558 pcs=499 max_fail_streak=0
+2026-11-19 13:07:21,151 [HIGH] user=KBB0189 at 2011-05-16 06:47:00 | models=OneClassSVM+LOF | fail_ratio=0.0 off_hours=0.464 pcs=1 max_fail_streak=0
+2026-11-19 13:07:22,217 [HIGH] user=KRG0158 at 2011-05-16 07:01:00 | models=OneClassSVM+LOF | fail_ratio=0.0 off_hours=0.456 pcs=1 max_fail_streak=0
+2026-11-19 13:08:06,176 [HIGH] user=PID0426 at 2011-05-16 08:07:00 | models=IsolationForest+OneClassSVM | fail_ratio=0.0 off_hours=0.153 pcs=13 max_fail_streak=0
