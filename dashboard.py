@@ -7,7 +7,7 @@ import streamlit as st
 from bootstrap import ensure_ready
 from config import (ALERT_FILE, CLEAN_FILE, COMPARISON_FILE, FEATURE_FILE, MODEL_RESULTS_FILE,
                     RESULTS_DIR, RISK_FILE, TRUTH_FILE)
-from src import charts
+from src import attack_tab, charts
 from src.features import FEATURE_COLS
 
 st.set_page_config(page_title="Log Anomaly Detection", page_icon="🛡️", layout="wide")
@@ -81,8 +81,8 @@ st.markdown("<div class='hero'><h1>Log Anomaly Detection</h1>"
             "<p>Isolation Forest · One-Class SVM · Local Outlier Factor with model-agreement risk scoring and "
             "real-time alerting</p></div>", unsafe_allow_html=True)
 
-tab_over, tab_eval, tab_users, tab_alerts = st.tabs(
-    ["📊 Overview", "🧪 Model evaluation", "🔎 Users & investigation", "🚨 Live alerts"])
+tab_over, tab_eval, tab_users, tab_alerts, tab_attack = st.tabs(
+    ["📊 Overview", "🧪 Model evaluation", "🔎 Users & investigation", "🚨 Live alerts", "🧨 Attack analyzer"])
 
 # ---------------------------------------------------------------- overview
 with tab_over:
@@ -207,3 +207,7 @@ with tab_alerts:
         st.dataframe(alerts.iloc[::-1], hide_index=True, width="stretch", height=300)
 
     live_alerts()
+
+# --------------------------------------------------------- attack analyzer
+with tab_attack:
+    attack_tab.render(kpi, plot)
