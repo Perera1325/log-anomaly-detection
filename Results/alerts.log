@@ -656,3 +656,14 @@
 2026-11-18 16:11:30,191 [HIGH] user=DMK0257 at 2011-05-16 12:01:15 | models=IsolationForest+OneClassSVM | fail_ratio=0.0 off_hours=0.049 pcs=1 max_fail_streak=0
 2026-11-18 16:11:39,232 [HIGH] user=ZDW0859 at 2011-05-16 13:37:54 | models=IsolationForest+OneClassSVM | fail_ratio=0.0 off_hours=0.0 pcs=3 max_fail_streak=0
 2026-11-18 16:11:39,626 [HIGH] user=RTO0313 at 2011-05-16 13:40:39 | models=IsolationForest+OneClassSVM | fail_ratio=0.0 off_hours=0.049 pcs=2 max_fail_streak=0
+2026-11-19 12:56:48,825 [CRITICAL] user=X at 2026-01-01 00:00:00 | models=IsolationForest+OneClassSVM+LOF | fail_ratio=0.9 off_hours=1.0 pcs=3 max_fail_streak=9
+2026-11-19 12:56:49,456 [CRITICAL] user=X at 2026-01-01 00:00:00 | models=IsolationForest+OneClassSVM+LOF | fail_ratio=0.9 off_hours=1.0 pcs=3 max_fail_streak=9
+2026-11-19 12:56:51,506 webhook failed: <urlopen error [WinError 10061] No connection could be made because the target machine actively refused it>
+2026-11-19 12:56:54,333 [CRITICAL] user=VICTIM9 at 2026-12-01 02:19:19 | models=IsolationForest+OneClassSVM+LOF | fail_ratio=0.65 off_hours=1.0 pcs=20 max_fail_streak=2
+2026-11-19 13:02:03,938 [HIGH] user=WPR0368 at 2011-05-13 03:11:10 | models=IsolationForest+OneClassSVM | fail_ratio=0.0 off_hours=0.536 pcs=603 max_fail_streak=0
+2026-11-19 13:02:06,250 [HIGH] user=DLM0051 at 2011-05-13 06:54:00 | models=OneClassSVM+LOF | fail_ratio=0.0 off_hours=0.232 pcs=3 max_fail_streak=0
+2026-11-19 13:02:07,023 [CRITICAL] user=AIB0948 at 2011-05-13 07:00:00 | models=IsolationForest+OneClassSVM+LOF | fail_ratio=0.0 off_hours=0.0 pcs=27 max_fail_streak=0
+2026-11-19 13:02:13,781 [HIGH] user=MMG0943 at 2011-05-13 07:09:00 | models=OneClassSVM+LOF | fail_ratio=0.0 off_hours=0.0 pcs=3 max_fail_streak=0
+2026-11-19 13:02:18,691 [HIGH] user=MNS0224 at 2011-05-13 07:27:00 | models=IsolationForest+OneClassSVM | fail_ratio=0.0 off_hours=0.582 pcs=530 max_fail_streak=0
+2026-11-19 13:02:21,081 [HIGH] user=WDO0870 at 2011-05-13 07:33:00 | models=IsolationForest+OneClassSVM | fail_ratio=0.0 off_hours=0.155 pcs=16 max_fail_streak=0
+2026-11-19 13:03:04,054 [HIGH] user=BKW0374 at 2011-05-13 08:12:00 | models=IsolationForest+OneClassSVM | fail_ratio=0.0 off_hours=0.558 pcs=499 max_fail_streak=0

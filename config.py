@@ -29,6 +29,6 @@ CONTAMINATION = 0.05
 SNAPSHOT_FRACS = (0.55, 0.65, 0.75, 0.85, 0.95)   # history cut-offs used to build training snapshots
 MIN_SNAPSHOT_EVENTS = 5
 RANDOM_STATE = 42
-WINDOW_DAYS = 30                  # rolling window used by the real-time monitor
+WINDOW_DAYS = 365                 # rolling window used by the real-time monitor
 MIN_EVENTS_FOR_SCORING = 20
 ALERT_MIN_VOTES = 2               # alert when >= 2 of 3 models flag a user
