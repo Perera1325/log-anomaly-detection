@@ -95,7 +95,10 @@ def analyze(df: pd.DataFrame) -> dict:
     if spray:
         patterns.append("Password spraying")
     worst = table.iloc[0]
-    return {"events": ev, "table": table, "z": Z, "spray": spray, "patterns": patterns,
+    shift = Z.median().sort_values(key=lambda v: -v.abs())          # median deviation from the training population
+    n_shift = int((shift.abs() >= 1).sum())
+    drift = "Low" if n_shift <= 2 else "Moderate" if n_shift <= 6 else "High"
+    return {"shift": shift, "n_shift": n_shift, "drift": drift, "events": ev, "table": table, "z": Z, "spray": spray, "patterns": patterns,
             "n_events": len(ev), "n_users": int(feats.shape[0]),
             "n_flagged": int((table["votes"] >= 2).sum()), "worst": worst,
             "verdict": "Critical" if (table["votes"] >= 3).any() else "High" if (table["votes"] >= 2).any()

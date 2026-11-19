@@ -161,9 +161,9 @@ def _js(obj) -> str:
     return json.dumps(_plain(obj), default=str).replace("</", "<\\/")
 
 
-def key_figures(items):
+def key_figures(items, animate=True):
     """items: list of (label, value, note). Flat strip of headline numbers (numbers count up when scrolled into view)."""
-    if not animating():
+    if not (animating() and animate):
         cells = "".join(f"<div class='f'><div class='l'>{esc(l)}</div><div class='v'>{esc(v)}</div>"
                         f"<div class='s'>{esc(s)}&nbsp;</div></div>" for l, v, s in items)
         st.markdown(f"<div class='figs'>{cells}</div>", unsafe_allow_html=True)
@@ -172,9 +172,9 @@ def key_figures(items):
     _embed(html_doc, 112)
 
 
-def plot(fig):
+def plot(fig, animate=True):
     """Render a Plotly figure; when animations are on, traces build up (bars grow, curves draw) on first view."""
-    if not animating():
+    if not (animating() and animate):
         st.plotly_chart(fig, width="stretch", theme=None,
                         config={"displaylogo": False, "toImageButtonOptions": {"format": "svg", "scale": 3}})
         return

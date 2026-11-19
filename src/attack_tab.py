@@ -5,7 +5,7 @@ from pathlib import Path
 import pandas as pd
 import streamlit as st
 
-from src import charts, ui
+from src import charts, mitre, ui
 from src.analyzer import analyze, read_log
 
 SAMPLES = Path(__file__).resolve().parent.parent / "sample_attacks"
@@ -35,6 +35,24 @@ def _banner(r):
     if r["verdict"] == "Medium":
         text += " Only one detector flags this account, so the signal is weak and no alert is raised."
     ui.callout(text, r["verdict"], f"{r['verdict']} risk.")
+
+
+def _drift(r, name, plot):
+    n, total = r["n_shift"], len(r["shift"])
+    note = {"Low": "The file resembles the training data, so model flags are directly comparable.",
+            "Moderate": "Some behaviour differs from the training data; treat borderline flags with care.",
+            "High": "The file differs strongly from the training data (or the attack itself is population-wide, "
+                    "such as password spraying). Interpret model flags with caution and consider retraining on "
+                    "local data."}[r["drift"]]
+    a, b = st.columns(2)
+    with a:
+        plot(charts.zscore_bar(r["shift"], top=8))
+        ui.figure_caption(f"atk-d-{name}", f"Median deviation of this file's accounts from the training population "
+                                           f"for the eight most shifted features.")
+    with b:
+        ui.callout(f"{n} of {total} features have a median shift of at least 1 standard deviation. {note}",
+                   {"Low": "Low", "Moderate": "Medium", "High": "High"}[r["drift"]],
+                   f"Domain shift: {r['drift']}.")
 
 
 def render(plot):
@@ -81,7 +99,8 @@ def render(plot):
     st.dataframe(pd.DataFrame([{
         "File": n, "Events": r["n_events"], "Accounts": r["n_users"],
         "Flagged": r["n_flagged"], "Risk": r["verdict"],
-        "Patterns found": ", ".join(r["patterns"]) or "-"} for n, r in results.items()]),
+        "Patterns found": ", ".join(r["patterns"]) or "-", "ATT&CK": mitre.ids(r["patterns"]),
+        "Domain shift": r["drift"]} for n, r in results.items()]),
         hide_index=True, width="stretch")
 
     for name, r in results.items():
@@ -96,8 +115,16 @@ def render(plot):
             for pc, k in r["spray"]:
                 ui.callout(f"Machine <b>{ui.esc(pc)}</b> failed against <b>{k}</b> different accounts.",
                            "High", "Password spraying.")
+            tech = mitre.techniques(r["patterns"])
+            if len(tech):
+                ui.table_caption(f"atk-m-{name}", "Detected patterns mapped to MITRE ATT&CK techniques. The mapping is "
+                                                  "indicative: behaviour consistent with a technique, not proof of it.")
+                st.dataframe(tech, hide_index=True, width="stretch", column_config={
+                    "Reference": st.column_config.LinkColumn("Reference", display_text="ATT&CK page"),
+                    "Tactic": st.column_config.TextColumn("Tactic", width="large")})
             t = r["table"]
             show = t[t["votes"] >= 1].head(10)
+            _drift(r, name, plot)
             if show.empty:
                 st.caption("No account was flagged by any detector.")
                 continue
@@ -108,6 +135,8 @@ def render(plot):
                 "user": "Account", "risk": "Risk", "models": "Detectors", "events": "Events",
                 "votes": st.column_config.ProgressColumn("Votes", min_value=0, max_value=3, format="%d / 3"),
                 "indicators": "Attack indicators", "most unusual": "Most unusual features (z-score)"})
+            st.download_button("Download analysis as CSV", t.to_csv(index=False).encode("utf-8"),
+                               file_name=f"analysis_{name}", mime="text/csv", key=f"csv_{name}")
             u = show.iloc[0]["user"]
             a, b = st.columns(2)
             with a:

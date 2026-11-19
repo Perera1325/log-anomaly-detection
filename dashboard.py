@@ -1,14 +1,19 @@
+import hashlib
 import os
+import platform
+import subprocess
 
+import numpy as np
 import pandas as pd
+import sklearn
 import streamlit as st
 from sklearn.metrics import average_precision_score, roc_auc_score
 
 from bootstrap import ensure_ready
 from config import (ALERT_FILE, ALERT_MIN_VOTES, CLEAN_FILE, COMPARISON_FILE, CONTAMINATION, FEATURE_FILE,
-                    MIN_EVENTS_FOR_SCORING, MODEL_RESULTS_FILE, MODELS_DIR, OFF_HOURS, RESULTS_DIR, RISK_FILE, TRUTH_FILE,
-                    WINDOW_DAYS)
-from src import attack_tab, charts, ui
+                    MIN_EVENTS_FOR_SCORING, MODEL_RESULTS_FILE, MODELS_DIR, OFF_HOURS, RANDOM_STATE, RESULTS_DIR,
+                    RISK_FILE, ROOT, TRUTH_FILE, WINDOW_DAYS)
+from src import attack_tab, charts, stats, ui
 from src.features import FEATURE_COLS
 
 st.set_page_config(page_title="Log Anomaly Detection", layout="wide")
@@ -35,6 +40,29 @@ def mtime(p):
 
 
 MODELS = {"IsolationForest": "IF_score", "OneClassSVM": "SVM_score", "LOF": "LOF_score"}
+
+
+@st.cache_data(show_spinner="Computing bootstrap intervals...")
+def cached_ci(results_df, truth_arr, n_boot=400):
+    return stats.bootstrap_table(results_df, truth_arr, n_boot)
+
+
+@st.cache_data(show_spinner=False)
+def data_fingerprint(path, mtime):
+    h = hashlib.sha256()
+    with open(path, "rb") as f:
+        for chunk in iter(lambda: f.read(1 << 20), b""):
+            h.update(chunk)
+    return h.hexdigest()[:12]
+
+
+def git_commit():
+    try:
+        out = subprocess.run(["git", "rev-parse", "--short", "HEAD"], capture_output=True, text=True, timeout=3,
+                             cwd=ROOT).stdout.strip()
+        return out or "not available"
+    except Exception:
+        return "not available"
 
 risk = load_csv(RISK_FILE, mtime(RISK_FILE))
 feats = load_csv(FEATURE_FILE, mtime(FEATURE_FILE))
@@ -166,7 +194,39 @@ with tab_eval:
         ui.figure_caption("rocpr", "Ranking quality of the raw anomaly scores, independent of the flagging "
                                    "threshold. Dash-dot lines mark chance performance.")
 
-    ui.section("2.3  Agreement between detectors")
+        n_pos = int(truth.sum())
+        ui.section("2.3  Uncertainty of the estimates",
+                   f"Only {n_pos} of {len(truth)} accounts are labelled insiders, so every estimate is uncertain. "
+                   "Intervals are 95% percentile-bootstrap intervals from 400 resamples of accounts.")
+        ci = cached_ci(results, truth.to_numpy())
+        wide = ci.assign(v=lambda d: d.apply(lambda r: f"{r.Estimate:.3f}  [{r.Lower:.3f}, {r.Upper:.3f}]", axis=1)) \
+            .pivot(index="Model", columns="Metric", values="v").reindex(
+                ["IsolationForest", "OneClassSVM", "LOF", "Ensemble (>=2 votes)"]).fillna("n/a").reset_index()
+        ui.table_caption("ci", "Point estimate and 95% bootstrap confidence interval for each metric.")
+        st.dataframe(wide[["Model", "Precision", "Recall", "F1", "ROC AUC", "Avg. precision"]], hide_index=True,
+                     width="stretch")
+        plot(charts.ci_plot(ci), animate=False)
+        ui.figure_caption("ciplot", "Point estimates with 95% bootstrap intervals. Overlapping intervals mean the "
+                                    "difference between two detectors is not clearly established.")
+
+        ui.section("2.4  Operating point (what-if)",
+                   "Flagging more accounts finds more insiders (recall rises) but also more false alarms "
+                   "(precision usually falls). Choose a detector and a flagging share to see the trade-off.")
+        c1, c2 = st.columns([1, 2])
+        det = c1.selectbox("Detector", list(MODELS), key="whatif_det")
+        pct = c2.slider("Share of accounts flagged (%)", 1, 20, int(round(CONTAMINATION * 100)), key="whatif_rate")
+        curve = stats.operating_curve(-results[MODELS[det]].to_numpy(), truth.to_numpy(), [i / 100 for i in range(1, 21)])
+        cur = curve.iloc[pct - 1]
+        ui.key_figures([("Accounts flagged", f"{int(cur.flagged):,}", f"{pct}% of accounts"),
+                        ("Insiders caught", f"{int(cur.tp)} of {n_pos}", "true positives"),
+                        ("Precision", f"{cur.Precision:.3f}", "share of flags that are insiders"),
+                        ("Recall", f"{cur.Recall:.3f}", "share of insiders caught"),
+                        ("F1", f"{cur.F1:.3f}", "harmonic mean")], animate=False)
+        plot(charts.operating_chart(curve, pct / 100), animate=False)
+        ui.figure_caption("operating", f"Precision, recall and F1 of the {det} detector as the flagged share "
+                                       "of accounts increases; the dash-dot line marks the selected operating point.")
+
+    ui.section("2.5  Agreement between detectors")
     a, b = st.columns(2)
     kappa = load_csv(RESULTS_DIR / "model_consistency.csv", mtime(RESULTS_DIR / "model_consistency.csv"),
                      index_col=0)
@@ -303,7 +363,19 @@ with tab_method:
               "synthetic data generator.",
               "Only logon events are used; file, device and e-mail behaviour are future work."]:
         st.markdown(f"- {t}")
-    ui.section("6.6  Reference")
+    ui.section("6.6  Reproducibility")
+    models_mtime = max((p.stat().st_mtime for p in MODELS_DIR.glob("*.pkl")), default=0)
+    ui.table_caption("repro", "Environment and settings that produced the figures on this page.")
+    st.dataframe(pd.DataFrame({"Item": [
+        "Python", "scikit-learn", "pandas", "NumPy", "Streamlit", "Random state", "Contamination",
+        "Feature window (days)", "Number of features", "Code version (git commit)",
+        "Cleaned data fingerprint (SHA-256, first 12 hex)", "Models last trained"],
+        "Value": [platform.python_version(), sklearn.__version__, pd.__version__, np.__version__, st.__version__,
+                  RANDOM_STATE, CONTAMINATION, WINDOW_DAYS, len(FEATURE_COLS), git_commit(),
+                  data_fingerprint(str(CLEAN_FILE), mtime(CLEAN_FILE)),
+                  pd.Timestamp(models_mtime, unit="s").strftime("%d %b %Y %H:%M") if models_mtime else "n/a"]}
+        ).astype({"Value": str}), hide_index=True, width="stretch", height=35 * 13 + 3)
+    ui.section("6.7  Reference")
     st.markdown("<p class='refs'>Glasser, J., &amp; Lindauer, B. (2013). Bridging the gap: A pragmatic approach to "
                 "generating insider threat data. <i>2013 IEEE Security and Privacy Workshops</i>, 98-104. "
                 "<a href='https://doi.org/10.1109/SPW.2013.37'>https://doi.org/10.1109/SPW.2013.37</a></p>",

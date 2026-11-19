@@ -262,3 +262,39 @@ def alerts_timeline(alerts):
     fig.update_yaxes(type="category")
     fig.update_xaxes(title="Time")
     return style(fig, height=max(300, 24 * a["user"].nunique() + 140))
+
+
+# ------------------------------------------------------- uncertainty / what-if
+def ci_plot(ci):
+    """Dot-and-whisker plot of point estimates with 95% bootstrap intervals, one panel per metric."""
+    metrics = ["Precision", "Recall", "F1", "ROC AUC", "Avg. precision"]
+    models = [m for m in ["IsolationForest", "OneClassSVM", "LOF", "Ensemble (>=2 votes)"] if m in set(ci["Model"])]
+    letters = "abcde"
+    fig = make_subplots(rows=1, cols=len(metrics), shared_yaxes=True, horizontal_spacing=0.03,
+                        subplot_titles=[f"({letters[i]}) {m}" for i, m in enumerate(metrics)])
+    for j, metric in enumerate(metrics, start=1):
+        d = ci[ci["Metric"] == metric].set_index("Model").reindex(models).dropna(subset=["Estimate"])
+        fig.add_trace(go.Scatter(
+            x=d["Estimate"], y=d.index, mode="markers", showlegend=False,
+            marker=dict(size=9, color=[MODEL_COLORS[m] for m in d.index], line=dict(width=0.8, color=AXIS)),
+            error_x=dict(type="data", symmetric=False, array=(d["Upper"] - d["Estimate"]).to_numpy(),
+                         arrayminus=(d["Estimate"] - d["Lower"]).to_numpy(), thickness=1.6, width=5, color=AXIS),
+            customdata=np.c_[d["Lower"], d["Upper"]],
+            hovertemplate="%{y}<br>%{x:.3f} (95% CI %{customdata[0]:.3f} to %{customdata[1]:.3f})<extra></extra>"),
+            row=1, col=j)
+        fig.update_xaxes(range=[0, 1], dtick=0.25, row=1, col=j, showgrid=True)
+    fig.update_yaxes(autorange="reversed", categoryorder="array", categoryarray=models)
+    fig.update_annotations(font=dict(size=12, family=FONT))
+    return style(fig, height=300, legend=False)
+
+
+def operating_chart(curve, rate):
+    """Precision, recall and F1 as the flagged share of accounts grows; the chosen operating point is marked."""
+    fig = go.Figure()
+    for metric, color, dash in [("Precision", BLUE, "solid"), ("Recall", ORANGE, "dash"), ("F1", BLACK, "dot")]:
+        fig.add_trace(go.Scatter(x=curve["rate"] * 100, y=curve[metric], mode="lines", name=metric,
+                                 line=dict(color=color, width=2.2, dash=dash)))
+    fig.add_vline(x=rate * 100, line=dict(color="#888", dash="dashdot", width=1))
+    fig.update_xaxes(title="Share of accounts flagged (%)")
+    fig.update_yaxes(title="Score", range=[0, 1.02])
+    return style(fig, height=330)
