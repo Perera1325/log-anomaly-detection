@@ -54,6 +54,22 @@ CSS = f"""
   border: 1px solid rgba(125,211,252,.65) !important; box-shadow: 0 0 18px rgba(76,201,240,.45), 0 0 36px rgba(199,125,255,.20);
   animation: pill .4s cubic-bezier(.2,.8,.2,1) both;}}
 @keyframes pill {{from {{opacity: 0; transform: scale(.85);}} to {{opacity: 1; transform: none;}}}}
+/* vertical navigation rail: tabs stacked on the left, panel on the right */
+@media (min-width: 900px) {{
+  div[data-orientation="horizontal"]:has(> [role="tablist"]) {{display: grid; grid-template-columns: 218px minmax(0, 1fr);
+    column-gap: 1.8rem; align-items: start;}}
+  div[data-orientation="horizontal"]:has(> [role="tablist"]) > [role="tablist"] {{grid-column: 1; grid-row: 1 / span 20;
+    position: sticky; top: 4.4rem; flex-direction: column; align-items: stretch; width: 100%; gap: 6px !important;
+    padding: 12px !important; border-radius: 18px; overflow: visible;}}
+  div[data-orientation="horizontal"]:has(> [role="tablist"]) > [role="tablist"]::before {{content: "SECTIONS";
+    font: 600 .66rem ui-monospace, Consolas, monospace; letter-spacing: .22em; color: #6B7AA3; padding: .1rem .6rem .5rem .6rem;}}
+  div[data-orientation="horizontal"]:has(> [role="tablist"]) > [role="tabpanel"], 
+  div[data-orientation="horizontal"]:has(> [role="tablist"]) > div:not([role="tablist"]) {{grid-column: 2;}}
+  [role="tablist"] > [role="tab"] {{width: 100%; justify-content: flex-start; border-radius: 12px !important; padding: .7rem .9rem !important;}}
+  [role="tablist"] > [role="tab"] .react-aria-SelectionIndicator {{border-radius: 12px !important;}}
+  [role="tablist"] > [role="tab"][aria-selected="true"]::after {{content: ""; position: absolute; right: .8rem; top: 50%; width: 6px; height: 6px;
+    margin-top: -3px; border-radius: 50%; background: #7DD3FC; box-shadow: 0 0 10px #4CC9F0;}}
+}}
 iframe {{border-radius: 12px;}}
 h1, h2, h3, h4, h5 {{font-family: {SERIF} !important; color: #E8ECF8; font-weight: 600; letter-spacing: 0;}}
 .titlebar {{padding-bottom: .5rem;}}
