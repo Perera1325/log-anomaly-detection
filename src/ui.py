@@ -15,34 +15,54 @@ CSS = f"""
 <style>
 .block-container {{padding-top: 4.2rem; max-width: 1180px;}}
 #MainMenu, footer {{visibility: hidden;}}
-h1, h2, h3, h4, h5 {{font-family: {SERIF} !important; color: #111; font-weight: 600; letter-spacing: 0;}}
+
+/* ---------------------------------------------------------------- dark aurora theme */
+.stApp {{background: #070B18;}}
+.stApp::before {{content: ""; position: fixed; inset: -20%; z-index: 0; pointer-events: none;
+  background: radial-gradient(40% 35% at 15% 10%, rgba(76,201,240,.22), transparent 70%),
+              radial-gradient(35% 35% at 90% 5%, rgba(199,125,255,.22), transparent 70%),
+              radial-gradient(40% 40% at 60% 100%, rgba(46,230,166,.12), transparent 70%);
+  animation: aurora 26s ease-in-out infinite alternate;}}
+@keyframes aurora {{from {{transform: translate3d(0,0,0) scale(1);}} to {{transform: translate3d(3%,2%,0) scale(1.12);}}}}
+[data-testid="stAppViewContainer"], [data-testid="stMain"] {{position: relative; z-index: 1; background: transparent;}}
+[data-testid="stHeader"] {{background: transparent;}}
+[data-testid="stSidebar"] {{background: rgba(12,18,38,.88); border-right: 1px solid rgba(255,255,255,.08);}}
+.block-container {{max-width: 1400px; padding-left: 2.2rem; padding-right: 2.2rem;}}
+.titlebar .title {{background: linear-gradient(90deg,#E8ECF8 10%,#7DD3FC 55%,#C77DFF); -webkit-background-clip: text;
+  background-clip: text; -webkit-text-fill-color: transparent;}}
+[data-baseweb="tab-highlight"] {{background: linear-gradient(90deg,#4CC9F0,#C77DFF) !important; height: 3px !important;}}
+[data-baseweb="tab"][aria-selected="true"] {{color: #7DD3FC !important;}}
+[data-testid="stExpander"] {{border: 1px solid rgba(255,255,255,.1); background: rgba(255,255,255,.03); border-radius: 10px;}}
+[data-testid="stDataFrame"] {{border: 1px solid rgba(255,255,255,.08); border-radius: 8px;}}
+iframe {{border-radius: 12px;}}
+h1, h2, h3, h4, h5 {{font-family: {SERIF} !important; color: #E8ECF8; font-weight: 600; letter-spacing: 0;}}
 .titlebar {{padding-bottom: .5rem;}}
 .titlebar > div {{flex: 1 1 360px; min-width: 0;}}
 .titlebar > svg {{flex: 0 0 330px;}}
-.titlebar .title {{font-family: {SERIF} !important; font-size: 2.1rem !important; font-weight: 600 !important; line-height: 1.22 !important; color: #111; margin: 0 !important;}}
-.titlebar .byline {{font-size: 1rem !important; color: #555; margin: .4rem 0 0 0;}}
-.abstract {{font-family: {SERIF}; font-size: 1.02rem; line-height: 1.62; color: #1a1a1a; margin: 0 0 .4rem 0;}}
+.titlebar .title {{font-family: {SERIF} !important; font-size: 2.1rem !important; font-weight: 600 !important; line-height: 1.22 !important; color: #E8ECF8; margin: 0 !important;}}
+.titlebar .byline {{font-size: 1rem !important; color: #9AA6C4; margin: .4rem 0 0 0;}}
+.abstract {{font-family: {SERIF}; font-size: 1.02rem; line-height: 1.62; color: #DCE2F2; margin: 0 0 .4rem 0;}}
 .abstract .h {{font-weight: 700; font-variant: small-caps; letter-spacing: .04em; margin-right: .4rem;}}
-.sec {{font-family: {SERIF}; font-size: 1.28rem; font-weight: 600; color: #111; margin: 1.9rem 0 .7rem 0;}}
-.sec::after {{content: ""; display: block; height: 1px; background: #BDBDBD; margin-top: .25rem;
+.sec {{font-family: {SERIF}; font-size: 1.28rem; font-weight: 600; color: #E8ECF8; margin: 1.9rem 0 .7rem 0;}}
+.sec::after {{content: ""; display: block; height: 1px; background: linear-gradient(90deg,#4CC9F0,#C77DFF 55%,transparent); margin-top: .25rem;
               transform-origin: left; animation: grow 1.1s .15s cubic-bezier(.2,.7,.2,1) both;}}
-.lead {{font-size: .95rem; color: #333; line-height: 1.55; margin: 0 0 .8rem 0;}}
-.cap {{font-family: {SERIF}; font-size: .92rem; color: #222; line-height: 1.5; margin: .1rem 0 1.6rem 0;}}
+.lead {{font-size: .95rem; color: #B7C1DC; line-height: 1.55; margin: 0 0 .8rem 0;}}
+.cap {{font-family: {SERIF}; font-size: .92rem; color: #CBD3EA; line-height: 1.5; margin: .1rem 0 1.6rem 0;}}
 .cap b {{font-weight: 700;}}
-.tcap {{font-family: {SERIF}; font-size: .92rem; color: #222; line-height: 1.5; margin: .9rem 0 .35rem 0;}}
+.tcap {{font-family: {SERIF}; font-size: .92rem; color: #CBD3EA; line-height: 1.5; margin: .9rem 0 .35rem 0;}}
 .tcap b {{font-weight: 700;}}
-.figs {{display: flex; border-top: 2px solid #111; border-bottom: 1px solid #BDBDBD; margin: .5rem 0 1.1rem 0;}}
-.figs .f {{flex: 1; padding: .55rem .95rem .6rem .95rem; border-left: 1px solid #E3E3E3; min-width: 0;}}
+.figs {{display: flex; border-top: 2px solid #4CC9F0; border-bottom: 1px solid rgba(255,255,255,.16); margin: .5rem 0 1.1rem 0;}}
+.figs .f {{flex: 1; padding: .55rem .95rem .6rem .95rem; border-left: 1px solid rgba(255,255,255,.09); min-width: 0;}}
 .figs .f:first-child {{border-left: none; padding-left: .1rem;}}
-.figs .l {{font-size: .7rem; text-transform: uppercase; letter-spacing: .09em; color: #555;}}
-.figs .v {{font-family: {SERIF}; font-size: 1.75rem; color: #111; line-height: 1.25;
+.figs .l {{font-size: .7rem; text-transform: uppercase; letter-spacing: .09em; color: #9AA6C4;}}
+.figs .v {{font-family: {SERIF}; font-size: 1.75rem; color: #E8ECF8; line-height: 1.25;
            font-variant-numeric: tabular-nums;}}
-.figs .s {{font-size: .78rem; color: #666; white-space: nowrap; overflow: hidden; text-overflow: ellipsis;}}
-.note {{border-left: 3px solid var(--c, #555); background: #F7F7F7; padding: .55rem .95rem; font-size: .93rem;
-        line-height: 1.5; margin: .5rem 0 .9rem 0; color: #1a1a1a;}}
+.figs .s {{font-size: .78rem; color: #8794B5; white-space: nowrap; overflow: hidden; text-overflow: ellipsis;}}
+.note {{border-left: 3px solid var(--c, #555); background: rgba(255,255,255,.05); border-radius: 0 8px 8px 0; padding: .55rem .95rem; font-size: .93rem;
+        line-height: 1.5; margin: .5rem 0 .9rem 0; color: #DCE2F2;}}
 .note .t {{font-weight: 700; margin-right: .35rem;}}
-.meta {{font-size: .85rem; color: #555; line-height: 1.55;}}
-.meta b {{color: #111;}}
+.meta {{font-size: .85rem; color: #9AA6C4; line-height: 1.55;}}
+.meta b {{color: #E8ECF8;}}
 .refs {{font-size: .9rem; line-height: 1.55; padding-left: 1.6rem; text-indent: -1.6rem;}}
 [data-baseweb="tab"] {{font-size: .95rem;}}
 
@@ -62,26 +82,26 @@ h1, h2, h3, h4, h5 {{font-family: {SERIF} !important; color: #111; font-weight: 
 [data-testid="stVerticalBlock"] > [data-testid="stElementContainer"]:nth-child(n+7) {{animation-delay: .30s;}}
 [data-baseweb="tab-panel"] {{animation: fade .5s ease both;}}
 .titlebar {{display: flex; justify-content: space-between; align-items: flex-end; gap: 2rem; flex-wrap: wrap;}}
-.rule {{height: 2px; background: #111; transform-origin: left; animation: grow 1.3s cubic-bezier(.2,.7,.2,1) both;
+.rule {{height: 2px; background: linear-gradient(90deg,#4CC9F0,#C77DFF 60%,transparent); transform-origin: left; animation: grow 1.3s cubic-bezier(.2,.7,.2,1) both;
         margin-bottom: 1.1rem;}}
 .trace {{display: block;}}
-.trace .axis {{stroke: #888; stroke-width: .8;}}
+.trace .axis {{stroke: #5B6A8F; stroke-width: .8;}}
 .trace .tick {{font: 8.5px {SERIF}; fill: #666;}}
 .trace .cap {{font: italic 9px {SERIF}; fill: #555;}}
 .trace path {{fill: none; stroke-width: 1.6; stroke-linejoin: round; stroke-linecap: round;
               stroke-dasharray: 1; stroke-dashoffset: 1; animation: draw 2.6s cubic-bezier(.4,0,.2,1) .4s forwards;}}
-.trace path.ok {{stroke: #0072B2;}}
-.trace path.bad {{stroke: #D55E00; animation-delay: 1.1s;}}
-.trace circle.pk {{fill: #0072B2;}}
-.trace circle.ring {{fill: none; stroke: #0072B2; stroke-width: 1; animation: ping 2.4s ease-out 2.6s infinite;}}
+.trace path.ok {{stroke: #4CC9F0;}}
+.trace path.bad {{stroke: #FF6B6B; animation-delay: 1.1s;}}
+.trace circle.pk {{fill: #4CC9F0;}}
+.trace circle.ring {{fill: none; stroke: #4CC9F0; stroke-width: 1; animation: ping 2.4s ease-out 2.6s infinite;}}
 .dot {{display: inline-block; width: 7px; height: 7px; border-radius: 50%; margin-right: .5rem; background: #7A7A7A;}}
-.dot.ok {{background: #009E73;}}
-.dot.live {{background: #009E73; animation: blink 1.8s ease-in-out infinite;}}
+.dot.ok {{background: #2EE6A6;}}
+.dot.live {{background: #2EE6A6; animation: blink 1.8s ease-in-out infinite;}}
 @media (prefers-reduced-motion: reduce) {{*, *::before, *::after {{animation: none !important; transition: none !important;}}}}
 </style>
 """
 
-LEVEL_COLOR = {"Low": "#7A7A7A", "Medium": "#B7791F", "High": "#C2410C", "Critical": "#7F1D1D", "note": "#555555"}
+LEVEL_COLOR = {"Low": "#7F8AA8", "Medium": "#FFB703", "High": "#FF6B6B", "Critical": "#FF2E63", "note": "#4CC9F0"}
 
 
 def esc(x) -> str:
@@ -250,14 +270,14 @@ def _ago(sec: float) -> str:
 
 
 _KF_HTML = """<!doctype html><html><head><meta charset="utf-8"><style>
-html,body{margin:0;background:transparent;font-family:"Helvetica Neue",Arial,sans-serif;color:#111}
-.figs{display:flex;position:relative;border-bottom:1px solid #BDBDBD;margin-top:6px}
-.figs::before{content:"";position:absolute;left:0;top:0;height:2px;width:100%;background:#111;transform-origin:left;transform:scaleX(0)}
-.f{flex:1;min-width:0;padding:10px 14px 10px 14px;border-left:1px solid #E3E3E3;opacity:0;transform:translateY(8px)}
+html,body{margin:0;background:transparent;font-family:"Helvetica Neue",Arial,sans-serif;color:#E8ECF8}
+.figs{display:flex;position:relative;border-bottom:1px solid rgba(255,255,255,.16);margin-top:6px}
+.figs::before{content:"";position:absolute;left:0;top:0;height:2px;width:100%;background:linear-gradient(90deg,#4CC9F0,#C77DFF);transform-origin:left;transform:scaleX(0)}
+.f{flex:1;min-width:0;padding:10px 14px 10px 14px;border-left:1px solid rgba(255,255,255,.09);opacity:0;transform:translateY(8px)}
 .f:first-child{border-left:none;padding-left:2px}
-.l{font-size:11px;text-transform:uppercase;letter-spacing:.09em;color:#555}
+.l{font-size:11px;text-transform:uppercase;letter-spacing:.09em;color:#9AA6C4}
 .v{font:28px Georgia,"Times New Roman",serif;line-height:1.25;font-variant-numeric:tabular-nums}
-.s{font-size:12.5px;color:#666;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.s{font-size:12.5px;color:#8794B5;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
 .go .figs::before{animation:grow 1.1s cubic-bezier(.2,.7,.2,1) forwards}
 .go .f{animation:rise .7s cubic-bezier(.2,.7,.2,1) forwards;animation-delay:calc(var(--i)*110ms + 150ms)}
 @keyframes grow{to{transform:scaleX(1)}}
@@ -342,9 +362,9 @@ new IntersectionObserver(function(es,io){if(es.some(function(e){return e.isInter
 _P3D_HTML = """<!doctype html><html><head><meta charset="utf-8"><style>
 html,body{margin:0;background:transparent;font-family:Georgia,'Times New Roman',serif}
 #w{position:relative}#g{width:100%;height:__H__px}
-#b{position:absolute;right:10px;bottom:10px;font:12px Georgia,serif;color:#1F3A5F;background:#fff;border:1px solid #999;
-padding:3px 10px;cursor:pointer;border-radius:2px}#b:hover{background:#F4F4F4}
-#h{position:absolute;left:10px;bottom:12px;font:12px Georgia,serif;color:#666}
+#b{position:absolute;right:10px;bottom:10px;font:12px Georgia,serif;color:#E8ECF8;background:rgba(18,26,51,.9);border:1px solid rgba(76,201,240,.55);
+padding:3px 10px;cursor:pointer;border-radius:2px}#b:hover{background:rgba(76,201,240,.2)}
+#h{position:absolute;left:10px;bottom:12px;font:12px Georgia,serif;color:#8794B5}
 </style><script src="__CDN__"></script></head><body><div id="w"><div id="g"></div>
 <span id="h">Drag to rotate, scroll to zoom, click a legend entry to hide a level</span>
 <button id="b" type="button">Pause rotation</button></div><script>
