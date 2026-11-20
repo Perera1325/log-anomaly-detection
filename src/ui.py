@@ -30,10 +30,30 @@ CSS = f"""
 .block-container {{max-width: 1400px; padding-left: 2.2rem; padding-right: 2.2rem;}}
 .titlebar .title {{background: linear-gradient(90deg,#E8ECF8 10%,#7DD3FC 55%,#C77DFF); -webkit-background-clip: text;
   background-clip: text; -webkit-text-fill-color: transparent;}}
-[data-baseweb="tab-highlight"] {{background: linear-gradient(90deg,#4CC9F0,#C77DFF) !important; height: 3px !important;}}
-[data-baseweb="tab"][aria-selected="true"] {{color: #7DD3FC !important;}}
-[data-testid="stExpander"] {{border: 1px solid rgba(255,255,255,.1); background: rgba(255,255,255,.03); border-radius: 10px;}}
-[data-testid="stDataFrame"] {{border: 1px solid rgba(255,255,255,.08); border-radius: 8px;}}
+/* tab bar: numbered glass capsule with a glowing selection pill (react-aria and older baseweb markup) */
+[role="tablist"], [data-baseweb="tab-list"] {{counter-reset: tabn; gap: 2px !important; padding: 5px !important; width: fit-content; max-width: 100%;
+  background: rgba(255,255,255,.04); border: 1px solid rgba(255,255,255,.10) !important; border-radius: 999px;
+  backdrop-filter: blur(6px); box-shadow: 0 0 30px rgba(76,201,240,.08);}}
+[data-baseweb="tab-border"] {{display: none !important;}}
+[role="tab"], [data-baseweb="tab"] {{counter-increment: tabn; position: relative; isolation: isolate; height: auto !important;
+  padding: .5rem 1.15rem !important; border-radius: 999px !important; background: transparent !important; border: none !important;
+  transition: color .25s ease, transform .25s ease;}}
+[role="tab"]::before, [data-baseweb="tab"]::before {{content: counter(tabn, decimal-leading-zero);
+  font: 600 .68rem ui-monospace, "SF Mono", Consolas, monospace; letter-spacing: .06em; color: #4CC9F0; opacity: .6;
+  margin-right: .5rem; vertical-align: .1em; transition: opacity .25s;}}
+[role="tab"], [role="tab"] * {{white-space: nowrap;}}
+[role="tab"] {{display: inline-flex; align-items: center;}}
+[role="tab"]:hover, [data-baseweb="tab"]:hover {{color: #fff !important; transform: translateY(-1px);}}
+[role="tab"]:hover::before {{opacity: 1;}}
+[role="tab"][aria-selected="true"], [data-baseweb="tab"][aria-selected="true"] {{color: #fff !important;}}
+[role="tab"][aria-selected="true"]::before {{opacity: 1; color: #7DD3FC;}}
+[role="tab"][aria-selected="true"] p {{color: #fff !important;}}
+.react-aria-SelectionIndicator, [data-baseweb="tab-highlight"] {{position: absolute !important; inset: 0 !important; height: auto !important;
+  width: auto !important; border-radius: 999px !important; z-index: -1; pointer-events: none;
+  background: linear-gradient(120deg, rgba(76,201,240,.30), rgba(199,125,255,.30)) !important;
+  border: 1px solid rgba(125,211,252,.65) !important; box-shadow: 0 0 18px rgba(76,201,240,.45), 0 0 36px rgba(199,125,255,.20);
+  animation: pill .4s cubic-bezier(.2,.8,.2,1) both;}}
+@keyframes pill {{from {{opacity: 0; transform: scale(.85);}} to {{opacity: 1; transform: none;}}}}
 iframe {{border-radius: 12px;}}
 h1, h2, h3, h4, h5 {{font-family: {SERIF} !important; color: #E8ECF8; font-weight: 600; letter-spacing: 0;}}
 .titlebar {{padding-bottom: .5rem;}}
