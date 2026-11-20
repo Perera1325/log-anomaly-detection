@@ -84,6 +84,38 @@ def user_map(feats, risk, feature_cols):
     return style(fig, height=360)
 
 
+def user_map_3d(feats, risk, feature_cols):
+    """3-D PCA projection of users (interactive; the dashboard rotates it slowly and fans the points out on first view)."""
+    X = StandardScaler().fit_transform(feats[feature_cols])
+    pca = PCA(n_components=3, random_state=42).fit(X)
+    p = pca.transform(X)
+    df = feats[["user"]].copy()
+    df["x"], df["y"], df["z"] = p[:, 0], p[:, 1], p[:, 2]
+    df = df.merge(risk[["user", "risk_level"]], on="user")
+    var = pca.explained_variance_ratio_ * 100
+    sym = {"Low": "circle", "Medium": "diamond", "High": "square", "Critical": "x"}
+    size = {"Low": 2.5, "Medium": 4, "High": 6, "Critical": 8}
+    fig = go.Figure()
+    for votes, lvl in enumerate(LEVELS):
+        d = df[df["risk_level"] == lvl]
+        fig.add_trace(go.Scatter3d(
+            x=d["x"], y=d["y"], z=d["z"], mode="markers", name=lvl, text=d["user"],
+            marker=dict(size=size[lvl], symbol=sym[lvl], color=RISK_COLORS[lvl],
+                        opacity=0.45 if lvl == "Low" else 0.95,
+                        line=dict(width=0.6 if lvl in ("Medium", "High") else 0, color=AXIS)),
+            hovertemplate="<b>%{text}</b><br>" + f"{lvl} risk ({votes} of 3 detectors)<extra></extra>"))
+    axis = dict(showbackground=True, backgroundcolor="#FAFAFA", gridcolor=GRID, zerolinecolor=GRID,
+                linecolor=AXIS, showline=True, ticks="", showticklabels=False, title_font=dict(size=12))
+    fig.update_layout(scene=dict(
+        xaxis=dict(title=f"PC1 ({var[0]:.0f}%)", **axis), yaxis=dict(title=f"PC2 ({var[1]:.0f}%)", **axis),
+        zaxis=dict(title=f"PC3 ({var[2]:.0f}%)", **axis), aspectmode="cube",
+        camera=dict(eye=dict(x=2.0, y=1.0, z=0.85))))
+    style(fig, height=520)
+    fig.update_layout(margin=dict(l=0, r=0, t=30, b=0),
+                      legend=dict(x=0, xanchor="left", y=1.0, yanchor="top", orientation="v"))
+    return fig
+
+
 def activity_heatmap(clean):
     ts = clean["timestamp"]
     z = pd.crosstab(ts.dt.dayofweek, ts.dt.hour).reindex(index=range(7), columns=range(24), fill_value=0)
