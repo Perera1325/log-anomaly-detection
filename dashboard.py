@@ -85,6 +85,7 @@ with st.sidebar:
     st.markdown("### Log Anomaly Detection")
     st.caption("Unsupervised detection of anomalous logon behaviour in Windows and Linux authentication logs.")
     st.toggle("Animations", value=True, key="animate")
+    st.toggle("Dark mode", value=True, key="dark_mode")
     st.divider()
     ui.status_block(MODELS_DIR, ALERT_FILE)
     st.divider()
