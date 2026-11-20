@@ -2,6 +2,7 @@ import base64
 import html
 import json
 import os
+import re
 from datetime import datetime
 
 import numpy as np
@@ -144,8 +145,50 @@ def esc(x) -> str:
     return html.escape(str(x))
 
 
+# ------------------------------------------------------------------ light / dark mode
+# The page is designed dark. Light mode inverts the page chrome with a CSS filter and re-inverts the chart frames,
+# whose own colours are remapped to the light palette here so that the net result is a normal light chart.
+_LIGHT = {
+    "#E8ECF8": "#111111", "#DCE2F2": "#1A1A1A", "#CBD3EA": "#222222", "#B7C1DC": "#333333", "#9AA6C4": "#555555",
+    "#8794B5": "#666666", "#6B7AA3": "#444444", "#5B6A8F": "#888888",
+    "#4CC9F0": "#0072B2", "#7DD3FC": "#1F3A5F", "#C77DFF": "#CC79A7", "#2EE6A6": "#009E73", "#FF6B6B": "#D55E00",
+    "#FFB703": "#E69F00", "#FF2E63": "#7F1D1D", "#7F8AA8": "#9A9A9A",
+    "#070B18": "#FFFFFF", "#121A33": "#FFFFFF", "#0D1530": "#FAFAFA", "#0F1730": "#FFFFFF", "#1B2444": "#FFFFFF",
+    "#2A3560": "#DDDDDD", "#3A86FF": "#08306B", "#119C7A": "#0B5D52",
+}
+_LIGHT_RE = re.compile(r"rgba\(255,\s*255,\s*255,|" + "|".join(re.escape(k) for k in _LIGHT), re.I)
+
+LIGHT_CSS = """<style>
+html {filter: invert(1) hue-rotate(180deg);}
+iframe, [data-testid="stPlotlyChart"] {filter: invert(1) hue-rotate(180deg);}
+.stApp::before {display: none;}
+</style>"""
+
+
+def is_dark() -> bool:
+    return bool(st.session_state.get("dark_mode", True))
+
+
+def _to_light(s: str) -> str:
+    return _LIGHT_RE.sub(lambda m: "rgba(0,0,0," if m.group(0).lower().startswith("rgba") else _LIGHT[m.group(0).upper()], s)
+
+
+def themed_fig(fig):
+    """The figure unchanged in dark mode; in light mode the same figure with the light palette and template."""
+    if is_dark():
+        return fig
+    import plotly.graph_objects as go
+    d = json.loads(fig.to_json())
+    d.get("layout", {}).pop("template", None)
+    out = go.Figure(json.loads(_to_light(json.dumps(d))))
+    out.update_layout(template="plotly_white")
+    return out
+
+
 def inject_css():
     st.markdown(CSS, unsafe_allow_html=True)
+    if not is_dark():
+        st.markdown(LIGHT_CSS, unsafe_allow_html=True)
 
 
 def reset_numbers():
@@ -174,6 +217,8 @@ def section(title: str, lead: str = None):
 
 def _embed(doc: str, height: int):
     """Raw HTML in an iframe: st.iframe on current Streamlit, components.html on older versions."""
+    if not is_dark():
+        doc = _to_light(doc)
     if hasattr(st, "iframe"):
         st.iframe(doc, height=height)
     else:
@@ -230,6 +275,7 @@ def key_figures(items, animate=True):
 
 def plot(fig, animate=True):
     """Render a Plotly figure; when animations are on, traces build up (bars grow, curves draw) on first view."""
+    fig = themed_fig(fig)
     if not (animating() and animate):
         st.plotly_chart(fig, width="stretch", theme=None,
                         config={"displaylogo": False, "toImageButtonOptions": {"format": "svg", "scale": 3}})
@@ -245,6 +291,7 @@ def plot(fig, animate=True):
 def plot3d(fig, animate=True):
     """3-D Plotly scene: points fan out from the centre on first view, then the scene orbits slowly.
     The orbit pauses while the pointer is over the figure, and there is a button to stop it."""
+    fig = themed_fig(fig)
     d = fig.to_dict()
     height = int(d.get("layout", {}).get("height") or 520)
     cfg = {"displaylogo": False, "toImageButtonOptions": {"format": "png", "scale": 2}}
