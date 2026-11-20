@@ -10,27 +10,27 @@ from sklearn.preprocessing import StandardScaler
 
 LEVELS = ["Low", "Medium", "High", "Critical"]
 # Okabe-Ito colour-blind-safe palette (Okabe & Ito, 2008)
-BLUE, ORANGE, GREEN, VERMILION, PURPLE, SKY, BLACK = ("#0072B2", "#E69F00", "#009E73", "#D55E00", "#CC79A7",
-                                                      "#56B4E9", "#000000")
-RISK_COLORS = {"Low": "#9A9A9A", "Medium": ORANGE, "High": VERMILION, "Critical": "#7F1D1D"}
+BLUE, ORANGE, GREEN, VERMILION, PURPLE, SKY, BLACK = ("#4CC9F0", "#FFB703", "#2EE6A6", "#FF6B6B", "#C77DFF",
+                                                      "#7DD3FC", "#E8ECF8")
+RISK_COLORS = {"Low": "#7F8AA8", "Medium": ORANGE, "High": VERMILION, "Critical": "#FF2E63"}
 MODEL_COLORS = {"IsolationForest": BLUE, "OneClassSVM": GREEN, "LOF": PURPLE, "Ensemble (>=2 votes)": BLACK}
 MODEL_DASH = {"IsolationForest": "solid", "OneClassSVM": "dash", "LOF": "dot"}
 SHORT = {"IsolationForest": "IF", "OneClassSVM": "SVM", "LOF": "LOF"}
 FONT = 'Georgia, "Times New Roman", Times, serif'
-INK, GRID, AXIS = "#111111", "#E6E6E6", "#222222"
+INK, GRID, AXIS = "#E8ECF8", "rgba(255,255,255,0.08)", "#6B7AA3"
 DAYS = ["Mon", "Tue", "Wed", "Thu", "Fri", "Sat", "Sun"]
-SEQ = [[0, "#FFFFFF"], [1, "#08306B"]]
-DIV = [[0, BLUE], [0.5, "#FFFFFF"], [1, VERMILION]]
+SEQ = [[0, "#0F1730"], [1, "#3A86FF"]]
+DIV = [[0, BLUE], [0.5, "#1B2444"], [1, VERMILION]]
 
 
 def style(fig, title=None, subtitle=None, height=360, legend=True):
     """title/subtitle are accepted for compatibility but not drawn (captions live under the figure)."""
     fig.update_layout(
-        template="simple_white", height=height, paper_bgcolor="white", plot_bgcolor="white",
+        template="plotly_dark", height=height, paper_bgcolor="rgba(0,0,0,0)", plot_bgcolor="rgba(0,0,0,0)",
         font=dict(family=FONT, size=13, color=INK), margin=dict(l=10, r=10, t=34, b=10), showlegend=legend,
         legend=dict(orientation="h", yanchor="bottom", y=1.02, xanchor="right", x=1, font=dict(size=12),
                     bgcolor="rgba(255,255,255,0)"),
-        hoverlabel=dict(font_family=FONT, bgcolor="white", bordercolor="#999"))
+        hoverlabel=dict(font_family=FONT, bgcolor="#121A33", bordercolor="#4CC9F0"))
     fig.update_xaxes(showline=True, mirror=True, linecolor=AXIS, linewidth=1, ticks="outside", tickcolor=AXIS,
                      gridcolor=GRID, zeroline=False, title_font=dict(size=13))
     fig.update_yaxes(showline=True, mirror=True, linecolor=AXIS, linewidth=1, ticks="outside", tickcolor=AXIS,
@@ -104,11 +104,11 @@ def user_map_3d(feats, risk, feature_cols):
                         opacity=0.45 if lvl == "Low" else 0.95,
                         line=dict(width=0.6 if lvl in ("Medium", "High") else 0, color=AXIS)),
             hovertemplate="<b>%{text}</b><br>" + f"{lvl} risk ({votes} of 3 detectors)<extra></extra>"))
-    axis = dict(showbackground=True, backgroundcolor="#FAFAFA", gridcolor=GRID, zerolinecolor=GRID,
+    axis = dict(showbackground=True, backgroundcolor="#0D1530", gridcolor="#2A3560", zerolinecolor="#2A3560",
                 linecolor=AXIS, showline=True, ticks="", showticklabels=False, title_font=dict(size=12))
     fig.update_layout(scene=dict(
         xaxis=dict(title=f"PC1 ({var[0]:.0f}%)", **axis), yaxis=dict(title=f"PC2 ({var[1]:.0f}%)", **axis),
-        zaxis=dict(title=f"PC3 ({var[2]:.0f}%)", **axis), aspectmode="cube",
+        zaxis=dict(title=f"PC3 ({var[2]:.0f}%)", **axis), aspectmode="cube", bgcolor="rgba(0,0,0,0)",
         camera=dict(eye=dict(x=2.0, y=1.0, z=0.85))))
     style(fig, height=520)
     fig.update_layout(margin=dict(l=0, r=0, t=30, b=0),
@@ -145,7 +145,7 @@ def hourly_profile(clean):
 # ---------------------------------------------------------------- evaluation
 def metrics_bars(summary):
     fig = go.Figure()
-    for metric, color in [("Precision", BLUE), ("Recall", ORANGE), ("F1", "#555555")]:
+    for metric, color in [("Precision", BLUE), ("Recall", ORANGE), ("F1", "#E8ECF8")]:
         fig.add_bar(x=summary["Model"], y=summary[metric], name=metric,
                     marker=dict(color=color, line=dict(color=AXIS, width=0.6)),
                     text=summary[metric].map("{:.2f}".format), textposition="outside", cliponaxis=False,
@@ -208,7 +208,7 @@ def kappa_heatmap(kappa):
     z = kappa.to_numpy()
     fig = go.Figure(go.Heatmap(
         z=z, x=list(kappa.columns), y=list(kappa.index), zmin=0, zmax=1, xgap=2, ygap=2, text=np.round(z, 2),
-        texttemplate="%{text}", textfont=dict(size=14), colorscale=[[0, "#FFFFFF"], [1, "#0B5D52"]],
+        texttemplate="%{text}", textfont=dict(size=14), colorscale=[[0, "#0F1730"], [1, "#119C7A"]],
         colorbar=dict(title="kappa", thickness=12, outlinewidth=0.8)))
     fig.update_yaxes(autorange="reversed")
     return _flat(style(fig, height=330, legend=False))
@@ -267,8 +267,8 @@ def user_timeline(ev):
     ev = ev.assign(hour=ev["timestamp"].dt.hour + ev["timestamp"].dt.minute / 60,
                    result=np.where(ev["event_id"] == 4625, "Failed", "Successful"))
     fig = go.Figure()
-    fig.add_hrect(y0=0, y1=7, fillcolor="#EDEDED", opacity=0.9, line_width=0, layer="below")
-    fig.add_hrect(y0=19, y1=24, fillcolor="#EDEDED", opacity=0.9, line_width=0, layer="below")
+    fig.add_hrect(y0=0, y1=7, fillcolor="rgba(255,255,255,0.07)", opacity=1, line_width=0, layer="below")
+    fig.add_hrect(y0=19, y1=24, fillcolor="rgba(255,255,255,0.07)", opacity=1, line_width=0, layer="below")
     for res, color, symbol, size in [("Successful", BLUE, "circle", 6), ("Failed", VERMILION, "x", 8)]:
         d = ev[ev["result"] == res]
         fig.add_trace(go.Scattergl(x=d["timestamp"], y=d["hour"], mode="markers", name=res,
