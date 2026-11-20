@@ -143,7 +143,15 @@ with tab_over:
                                  "features. Each marker is an account; marker shape and colour give the risk level. "
                                  "Distance reflects dissimilarity of behaviour.")
 
-    ui.section("1.2  Temporal structure of logon activity")
+    ui.section("1.2  Three-dimensional behavioural space",
+               "The same projection with a third principal component. The scene fans out from the centre when it "
+               "scrolls into view, then rotates slowly; it pauses while the pointer is over it.")
+    ui.plot3d(charts.user_map_3d(feats, risk, FEATURE_COLS))
+    ui.figure_caption("map3d", "Three-dimensional principal component projection of the standardised behavioural "
+                               "features. Marker shape and colour give the risk level; accounts far from the main "
+                               "cloud behave differently from most others.")
+
+    ui.section("1.3  Temporal structure of logon activity")
     a, b = st.columns([3, 2])
     with a:
         plot(charts.activity_heatmap(clean))

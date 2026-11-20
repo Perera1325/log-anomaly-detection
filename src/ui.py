@@ -186,6 +186,20 @@ def plot(fig, animate=True):
     _embed(doc, height + 4)
 
 
+def plot3d(fig, animate=True):
+    """3-D Plotly scene: points fan out from the centre on first view, then the scene orbits slowly.
+    The orbit pauses while the pointer is over the figure, and there is a button to stop it."""
+    d = fig.to_dict()
+    height = int(d.get("layout", {}).get("height") or 520)
+    cfg = {"displaylogo": False, "toImageButtonOptions": {"format": "png", "scale": 2}}
+    if not (animating() and animate):
+        st.plotly_chart(fig, width="stretch", theme=None, config=cfg)
+        return
+    doc = (_P3D_HTML.replace("__CDN__", PLOTLY_CDN).replace("__FIG__", _js({"data": d["data"], "layout": d["layout"]}))
+           .replace("__CFG__", _js(cfg)).replace("__H__", str(height)))
+    _embed(doc, height + 4)
+
+
 def hero(title: str, byline: str, ok, bad):
     """Title block with a hand-drawn-style signal trace of hourly logon volume (drawn in once on load)."""
     ok, bad = list(ok), list(bad)
@@ -318,6 +332,89 @@ function start(){
         if(u.range==null&&ax.range){layout[k]=Object.assign({},u,{range:ax.range.slice(),autorange:false});}}
     });
     return Plotly.react(gd,merged(0),layout,config).then(function(){gd.style.visibility='visible';play();});
+  }).catch(function(e){console.error(e);gd.style.visibility='visible';});
+}
+new IntersectionObserver(function(es,io){if(es.some(function(e){return e.isIntersecting})){io.disconnect();start();}},{threshold:0.2}).observe(gd);
+})();
+</script></body></html>"""
+
+
+_P3D_HTML = """<!doctype html><html><head><meta charset="utf-8"><style>
+html,body{margin:0;background:transparent;font-family:Georgia,'Times New Roman',serif}
+#w{position:relative}#g{width:100%;height:__H__px}
+#b{position:absolute;right:10px;bottom:10px;font:12px Georgia,serif;color:#1F3A5F;background:#fff;border:1px solid #999;
+padding:3px 10px;cursor:pointer;border-radius:2px}#b:hover{background:#F4F4F4}
+#h{position:absolute;left:10px;bottom:12px;font:12px Georgia,serif;color:#666}
+</style><script src="__CDN__"></script></head><body><div id="w"><div id="g"></div>
+<span id="h">Drag to rotate, scroll to zoom, click a legend entry to hide a level</span>
+<button id="b" type="button">Pause rotation</button></div><script>
+(function(){
+var FIG=__FIG__,CFG=__CFG__;
+var gd=document.getElementById('g'),btn=document.getElementById('b');
+var data=FIG.data,layout=FIG.layout||{};
+delete layout.width;layout.autosize=true;layout.height=__H__;
+var ANIM=!matchMedia('(prefers-reduced-motion: reduce)').matches;
+var config=Object.assign({responsive:true},CFG);
+var ax=['x','y','z'];
+ax.forEach(function(a){
+  var lo=Infinity,hi=-Infinity;
+  data.forEach(function(tr){(tr[a]||[]).forEach(function(v){if(v<lo)lo=v;if(v>hi)hi=v;});});
+  var p=(hi-lo)*0.06;
+  layout.scene[a+'axis']=Object.assign({},layout.scene[a+'axis'],{range:[lo-p,hi+p],autorange:false});
+});
+var mid=ax.map(function(a){var r=layout.scene[a+'axis'].range;return (r[0]+r[1])/2;});
+var orig=data.map(function(tr){return {x:tr.x.slice(),y:tr.y.slice(),z:tr.z.slice()};});
+var idx=data.map(function(_,i){return i;});
+function setT(t){
+  var X=[],Y=[],Z=[];
+  orig.forEach(function(o){
+    X.push(o.x.map(function(v){return mid[0]+(v-mid[0])*t;}));
+    Y.push(o.y.map(function(v){return mid[1]+(v-mid[1])*t;}));
+    Z.push(o.z.map(function(v){return mid[2]+(v-mid[2])*t;}));
+  });
+  return Plotly.restyle(gd,{x:X,y:Y,z:Z},idx);
+}
+var e0=(layout.scene.camera||{}).eye||{x:1.75,y:0.9,z:0.75};
+var theta=Math.atan2(e0.y,e0.x),R=Math.hypot(e0.x,e0.y),Zc=e0.z;
+var spinning=ANIM,hover=false,ready=false,last=null;
+function setLabel(){btn.textContent=spinning?'Pause rotation':'Resume rotation';}
+btn.onclick=function(){spinning=!spinning;setLabel();};
+setLabel();
+if(!ANIM)btn.style.display='none';
+gd.addEventListener('mouseenter',function(){hover=true;});
+gd.addEventListener('mouseleave',function(){hover=false;});
+function tick(ts){
+  if(last===null)last=ts;var dt=Math.min(ts-last,64);last=ts;
+  if(ready&&spinning&&!hover){
+    theta+=dt*0.00014;
+    Plotly.relayout(gd,{'scene.camera.eye':{x:R*Math.cos(theta),y:R*Math.sin(theta),z:Zc}});
+  }
+  requestAnimationFrame(tick);
+}
+function follow(){
+  gd.on('plotly_relayout',function(ev){
+    var c=ev&&ev['scene.camera'];
+    if(c&&c.eye){theta=Math.atan2(c.eye.y,c.eye.x);R=Math.hypot(c.eye.x,c.eye.y);Zc=c.eye.z;}
+  });
+}
+function ease(x){return 1-Math.pow(1-x,3);}
+function intro(){
+  var t0=null,D=1500;
+  function step(ts){
+    if(t0===null)t0=ts;var x=Math.min((ts-t0)/D,1);
+    setT(ease(x));
+    if(x<1)requestAnimationFrame(step);else{ready=true;}
+  }
+  requestAnimationFrame(step);
+}
+var started=false;
+function start(){
+  if(started)return;started=true;gd.style.visibility='hidden';
+  if(ANIM){data.forEach(function(tr,i){tr.x=orig[i].x.map(function(){return mid[0];});
+    tr.y=orig[i].y.map(function(){return mid[1];});tr.z=orig[i].z.map(function(){return mid[2];});});}
+  Plotly.newPlot(gd,data,layout,config).then(function(){
+    gd.style.visibility='visible';follow();
+    if(ANIM){intro();requestAnimationFrame(tick);}
   }).catch(function(e){console.error(e);gd.style.visibility='visible';});
 }
 new IntersectionObserver(function(es,io){if(es.some(function(e){return e.isIntersecting})){io.disconnect();start();}},{threshold:0.2}).observe(gd);
