@@ -384,8 +384,3 @@ with tab_method:
                   data_fingerprint(str(CLEAN_FILE), mtime(CLEAN_FILE)),
                   pd.Timestamp(models_mtime, unit="s").strftime("%d %b %Y %H:%M") if models_mtime else "n/a"]}
         ).astype({"Value": str}), hide_index=True, width="stretch", height=35 * 13 + 3)
-    ui.section("6.7  Reference")
-    st.markdown("<p class='refs'>Glasser, J., &amp; Lindauer, B. (2013). Bridging the gap: A pragmatic approach to "
-                "generating insider threat data. <i>2013 IEEE Security and Privacy Workshops</i>, 98-104. "
-                "<a href='https://doi.org/10.1109/SPW.2013.37'>https://doi.org/10.1109/SPW.2013.37</a></p>",
-                unsafe_allow_html=True)
