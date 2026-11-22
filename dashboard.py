@@ -86,6 +86,7 @@ with st.sidebar:
     st.caption("Unsupervised detection of anomalous logon behaviour in Windows and Linux authentication logs.")
     st.toggle("Animations", value=True, key="animate")
     st.toggle("Dark mode", value=True, key="dark_mode")
+    st.caption("Developed by Methum Dulneth")
     st.divider()
     ui.status_block(MODELS_DIR, ALERT_FILE)
     st.divider()
