@@ -42,9 +42,34 @@ def mtime(p):
 MODELS = {"IsolationForest": "IF_score", "OneClassSVM": "SVM_score", "LOF": "LOF_score"}
 
 
-@st.cache_data(show_spinner="Computing bootstrap intervals...")
+CI_FILE = RESULTS_DIR / "bootstrap_ci.csv"
+CI_META = RESULTS_DIR / "bootstrap_ci.key"
+
+
+def _ci_key(results_df, truth_arr, n_boot):
+    h = hashlib.sha256()
+    h.update(np.ascontiguousarray(results_df[list(MODELS) + list(MODELS.values())].to_numpy(dtype=float)).tobytes())
+    h.update(np.asarray(truth_arr, dtype=int).tobytes())
+    h.update(str(n_boot).encode())
+    return h.hexdigest()
+
+
+@st.cache_data(show_spinner="Computing bootstrap intervals (first run only)...")
 def cached_ci(results_df, truth_arr, n_boot=400):
-    return stats.bootstrap_table(results_df, truth_arr, n_boot)
+    """Bootstrap intervals; the result is stored on disk and reused, so later starts are instant."""
+    key = _ci_key(results_df, truth_arr, n_boot)
+    try:
+        if CI_FILE.exists() and CI_META.read_text().strip() == key:
+            return pd.read_csv(CI_FILE)
+    except Exception:
+        pass
+    table = stats.bootstrap_table(results_df, truth_arr, n_boot)
+    try:
+        table.to_csv(CI_FILE, index=False)
+        CI_META.write_text(key)
+    except Exception:
+        pass
+    return table
 
 
 @st.cache_data(show_spinner=False)
@@ -125,7 +150,7 @@ tab_over, tab_eval, tab_users, tab_alerts, tab_attack, tab_insights, tab_method 
 
 # ---------------------------------------------------------------- insights
 with tab_insights:
-    insights_tab.render()
+    insights_tab.render(results, truth)
 
 # ---------------------------------------------------------------- overview
 with tab_over:

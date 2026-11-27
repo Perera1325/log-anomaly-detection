@@ -6,7 +6,7 @@ import plotly.graph_objects as go
 import streamlit as st
 
 from config import RESULTS_DIR
-from src import ui
+from src import stats, ui
 
 INSIGHTS_FILE = RESULTS_DIR / "insights.json"
 
@@ -17,7 +17,7 @@ def _load():
     return json.loads(INSIGHTS_FILE.read_text(encoding="utf-8"))
 
 
-def render():
+def render(results=None, truth=None):
     d = _load()
     if d is None:
         st.info("Results/insights.json not found. Run the analysis scripts to generate it.")
@@ -29,6 +29,33 @@ def render():
         ("95th percentile", f"{lat['p95']} ms", "per event"),
         ("Throughput", f"{lat['per_sec']}/s", "single process"),
         ("Correlated pairs", d["n_high_corr"], "|rho| >= 0.90")])
+
+
+    if results is not None:
+        ui.section("Review budget: how many accounts can an analyst check?",
+                   "Rank accounts by the Isolation Forest anomaly score and flag only the top N. "
+                   "Move the slider to see how many true insiders each budget finds.")
+        n_max = min(200, len(results))
+        k = st.slider("Accounts reviewed (top N by anomaly score)", 5, n_max, 50, step=5)
+        score = -results["IF_score"].to_numpy()
+        order = score.argsort()[::-1][:k]
+        top = results.iloc[order][["user"]].copy()
+        top["Anomaly score"] = score[order].round(4)
+        top["Rank"] = range(1, k + 1)
+        if truth is not None:
+            curve = stats.operating_curve(score, truth.to_numpy(), [k / len(results)]).iloc[0]
+            ui.key_figures([
+                ("Flagged", f"{int(curve['flagged'])}", "accounts reviewed"),
+                ("True insiders found", f"{int(curve['tp'])}", "of those flagged"),
+                ("Precision", f"{curve['Precision']:.2f}", "share of flags that are real"),
+                ("Recall", f"{curve['Recall']:.2f}", "share of insiders found"),
+                ("F1", f"{curve['F1']:.2f}", "balance of the two")])
+            top["Reference label"] = truth.to_numpy()[order]
+        st.dataframe(top[["Rank", "user", "Anomaly score"] + (["Reference label"] if truth is not None else [])],
+                     hide_index=True, width="stretch", height=320)
+        st.download_button("Download this review list (CSV)", top.to_csv(index=False).encode("utf-8"),
+                           file_name=f"review_list_top{k}.csv", mime="text/csv")
+        st.caption("A flag marks unusual behaviour. It is not evidence of an incident; a person must review it.")
 
     ui.section("Feature-family ablation",
                "Isolation Forest re-trained with each feature family removed or used alone (5 seeds). "
