@@ -13,7 +13,7 @@ from bootstrap import ensure_ready
 from config import (ALERT_FILE, ALERT_MIN_VOTES, CLEAN_FILE, COMPARISON_FILE, CONTAMINATION, FEATURE_FILE,
                     MIN_EVENTS_FOR_SCORING, MODEL_RESULTS_FILE, MODELS_DIR, OFF_HOURS, RANDOM_STATE, RESULTS_DIR,
                     RISK_FILE, ROOT, TRUTH_FILE, WINDOW_DAYS)
-from src import attack_tab, charts, stats, ui
+from src import attack_tab, charts, insights_tab, stats, ui
 from src.features import FEATURE_COLS
 
 st.set_page_config(page_title="Log Anomaly Detection", layout="wide")
@@ -120,8 +120,12 @@ st.markdown(
     f"detectors; {'none is' if n3 == 0 else f'{n3} are'} flagged by all three.{summary_sentence}</p>",
     unsafe_allow_html=True)
 
-tab_over, tab_eval, tab_users, tab_alerts, tab_attack, tab_method = st.tabs(
-    ["Overview", "Evaluation", "Account analysis", "Alerts", "Attack scenarios", "Methodology"])
+tab_over, tab_eval, tab_users, tab_alerts, tab_attack, tab_insights, tab_method = st.tabs(
+    ["Overview", "Evaluation", "Account analysis", "Alerts", "Attack scenarios", "Research insights", "Methodology"])
+
+# ---------------------------------------------------------------- insights
+with tab_insights:
+    insights_tab.render()
 
 # ---------------------------------------------------------------- overview
 with tab_over:
